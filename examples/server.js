@@ -105,7 +105,7 @@ async function processChangeProject(changeProjects) {
                     if (addResponse.status === 200) {
                         console.log('addResponseOK.' + JSON.stringify(addResponse.data));
                         // 如果 add 成功，可以在这里处理后续逻辑
-                        var changeProjectsin = [];
+                        let changeProjectsin = [];
                         changeProjectsin.push(changeProject);
                         return processDeleteProjects(changeProjectsin);
                     } else {
@@ -122,7 +122,7 @@ async function processChangeProject(changeProjects) {
 
             // 等待所有请求完成
             const addResults = await Promise.all(addPromises);
-            return addResults; // 返回所有操作的结果
+            return addResults.flat(); // 返回所有操作的结果
 
         }else {
             // 如果 add 失败，可以在这里处理错误，例如返回错误信息或抛出异常
@@ -159,7 +159,7 @@ async function processDeleteProjects(projects) {
                     try {
                         const DeleteResponse = await axios.delete(`${ProjectAPIUrl}/${project.projectid}/members/${getUserResponse.data.id}`, config);
                         console.log('deleteOK:', JSON.stringify(DeleteResponse.data));
-                        resolve(DeleteResponse); // 解决 Promise，并返回成功的响应
+                        resolve({ success: true, error: DeleteResponse.data}); // 解决 Promise，并返回成功的响应
                     } catch (error) {
                         console.error('deletefailed:', error.response ? error.response.data : error.message);
                         resolve({ success: false, error: error.response ? error.response.data : error.message }); // 解决 Promise，并返回失败的响应
@@ -181,21 +181,20 @@ async function processDeleteProjects(projects) {
 async function processAllProjects(ChangeProjects, DeleteProjects) {
     try {
         // 处理 ChangeProjects 的串行 add 和 move 操作
-        var changeResults;
-        var deleteResults;
+        let MychangeResults=[];
         if (ChangeProjects.length > 0) {
-            changeResults = await processChangeProject(ChangeProjects);
+            MychangeResults = await processChangeProject(ChangeProjects);
         }
 
         // 并行处理 DeleteProjects 的 delete 操作
+        let MydeleteResults = [];
         if (DeleteProjects.length > 0) {
-             deleteResults = await processDeleteProjects(DeleteProjects);
+             MydeleteResults = await processDeleteProjects(DeleteProjects);
         }
-
         // 返回所有操作的结果
         return {
-            changeResults,
-            deleteResults
+            changeResults:MychangeResults,
+            deleteResults:MydeleteResults
         };
     } catch (error) {
         // 处理错误
@@ -365,29 +364,15 @@ server = http.createServer(function (req, res) {
           processAllProjects(ChangeProjects, DeleteProjects)
               .then((results) => {
                   // 将结果转换为字符串
-                 // const resultString = JSON.stringify(results);
-                  const resultString = JSON.stringify(results, (key, value) => {
-                      // 检测循环引用的逻辑
-                      // 假设我们使用一个 WeakSet 来跟踪已经访问过的对象
-                      const seen = new WeakSet();
-
-                      if (typeof value === 'object' && value !== null) {
-                          if (seen.has(value)) {
-                              // 如果对象已经被访问过，表明存在循环引用
-                              return undefined; // 返回 undefined 以排除该属性
-                          }
-                          seen.add(value); // 标记当前对象为已访问
-                      }
-
-                      // 对于没有循环引用的对象，返回原始值
-                      return value;
-                  });
+                 // const resultString = 'test';
+                  const resultString = JSON.stringify(results);
 
                   console.log('log:processAllProjectsDone:', resultString);
                   // 设置响应头
                   res.writeHead(200, { 'Content-Type': 'application/json' });
+                  res.write(resultString);
                   // 发送响应数据
-                  res.end(resultString);
+                  res.end();
                 //  console.log('Results of all projects sent:', results);
               })
               .catch((error) => {
