@@ -80,9 +80,9 @@ function pipeFileToResponse(res, file, type) {
 async function processChangeProject(changeProjects) {
     try {
 
-        const UsersAPIUrl = 'http://git.code.tencent.com/api/v3/users';
-        const UserAPIUrl = 'http://git.code.tencent.com/api/v3/user';
-        const ProjectAPIUrl = 'http://git.code.tencent.com/api/v3/projects';
+        const UsersAPIUrl = 'https://git.code.tencent.com/api/v3/users';
+        const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
+        const ProjectAPIUrl = 'https://git.code.tencent.com/api/v3/projects';
 
         const config = {
             headers: {
@@ -138,8 +138,8 @@ async function processChangeProject(changeProjects) {
 // 处理 DeleteProjects 中的并行 delete 操作
 async function processDeleteProjects(projects) {
     try {
-        const UserAPIUrl = 'http://git.code.tencent.com/api/v3/user';
-        const ProjectAPIUrl = 'http://git.code.tencent.com/api/v3/projects';
+        const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
+        const ProjectAPIUrl = 'https://git.code.tencent.com/api/v3/projects';
 
         const config = {
             headers: {
@@ -274,7 +274,7 @@ server = http.createServer(function (req, res) {
 
 
               const instance = axios.create({
-                  baseURL: 'http://git.code.tencent.com/api/v3/',
+                  baseURL: 'https://git.code.tencent.com/api/v3/',
                   timeout: 1000,
                   headers: { 'PRIVATE-TOKEN': MyPrivate_Key }
               });
