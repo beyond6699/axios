@@ -76,6 +76,249 @@ function pipeFileToResponse(res, file, type) {
   fs.createReadStream(path.join(__dirname, file)).pipe(res);
 }
 
+
+
+async function getProjects(Private_Key,page,per_page) {
+    const projectsAPIUrl = 'https://git.code.tencent.com/api/v3/projects';
+
+    var out = [];
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+    
+    const Response = await axios.get(`${projectsAPIUrl}/?page=${page}&per_page=${per_page}`, config);
+    if (Response && Response.status === 200) {
+        //console.log('gprojectsResponseOK.' + JSON.stringify(Response.data));
+        out = Response.data;
+    } else {
+        console.log('projectsResponsefalse.' + JSON.stringify(Response.data));
+
+    }
+    return out;
+}
+async function getAllProjects(Private_Key) {
+ 
+    let page = 1; // 从第一页开始
+    let allData = []; // 存储所有数据的数组
+    while (true) {
+        const response = await getProjects(Private_Key,page, 100); 
+        allData = allData.concat(response); 
+        if ( response.length<100) {
+            break;
+        }
+        page++;
+    }
+    return allData;
+}
+
+
+async function getProjectMembers(Private_Key, projectid, page, per_page) {
+    const projectsAPIUrl = 'https://git.code.tencent.com/api/v3/projects';
+
+    var out = [];
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+    const Response = await axios.get(`${projectsAPIUrl}/${projectid}/members?page=${page}&per_page=${per_page}`, config);
+    if (Response && Response.status === 200) {
+        //console.log('gprojectsResponseOK.' + JSON.stringify(Response.data));
+        out = Response.data;
+    } else {
+        console.log('projectsResponsefalse.' + JSON.stringify(Response.data));
+
+    }
+    return out;
+}
+async function getAllProjectsMembers(Private_Key, projectid) {
+
+    let page = 1; // 从第一页开始
+    let allData = []; // 存储所有数据的数组
+    while (true) {
+        const response = await getProjectMembers(Private_Key, projectid, page, 100);
+        allData = allData.concat(response);
+        if (response.length < 100) {
+            break;
+        }
+        page++;
+    }
+    return allData;
+}
+
+//async function getGroupOwned(Private_Key) {
+//    const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/groups/Owned';
+
+//    var out = [];
+//    const config = {
+//        headers: {
+//            'PRIVATE-TOKEN': Private_Key,
+//            'Content-Type': 'application/json',
+//        }
+//    };
+//    const Response = await axios.get(groupsAPIUrl, config);
+//    if (Response && Response.status === 200) {
+//        //console.log('getGroupOwnedOK.' + JSON.stringify(Response.data));
+//        out = Response.data;
+//    } else {
+//        console.log('getGroupOwnedfalse.' + JSON.stringify(Response.data));
+
+//    }
+//    return out;
+//}
+
+
+async function getGroups(Private_Key, page, per_page) {
+    const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/groups';
+
+    var out = [];
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+
+    const Response = await axios.get(`${groupsAPIUrl}/?page=${page}&per_page=${per_page}`, config);
+    if (Response&&Response.status === 200) {
+        //console.log('groupsResponseOK.' + JSON.stringify(Response.data));
+        out =Response.data;
+    } else {
+        console.log('groupsResponsefalse.' + JSON.stringify(Response.data));
+
+    }
+    return out;
+}
+async function getAllGroups(Private_Key) {
+
+    let page = 1; // 从第一页开始
+    let allData = []; // 存储所有数据的数组
+    while (true) {
+        const response = await getGroups(Private_Key, page, 100);
+        allData = allData.concat(response);
+        if (response.length < 100) {
+            break;
+        }
+        page++;
+    }
+    return allData;
+}
+
+async function getselfUser(Private_Key) {
+    const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/user';
+
+    var out = [];
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+    const Response = await axios.get(`${groupsAPIUrl}`, config);
+    if (Response && Response.status === 200) {
+      //  console.log('getselfUsersOK.' + JSON.stringify(Response.data));
+        out = Response.data;
+    } else {
+        console.log('getselfUserfalse.' + JSON.stringify(Response.data));
+
+    }
+    return out;
+}
+async function getGroupMembers(Private_Key, Groupid,page, per_page) {
+    const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/groups';
+
+    var out = [];
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+    const Response = await axios.get(`${groupsAPIUrl}/${Groupid}/members?page=${page}&per_page=${per_page}`, config);
+    if (Response && Response.status === 200) {
+       // console.log('getGroupMembersOK.' + JSON.stringify(Response.data));
+        out = Response.data;
+    } else {
+        console.log('getGroupMembersfalse.' + JSON.stringify(Response.data));
+
+    }
+    return out;
+}
+
+async function getAllGroupMembers(Private_Key, Groupid) {
+
+    let page = 1; // 从第一页开始
+    let allData = []; // 存储所有数据的数组
+    while (true) {
+        const response = await getGroupMembers(Private_Key, Groupid, page, 100);
+        allData = allData.concat(response);
+        if (response.length < 100) {
+            break;
+        }
+        page++;
+    }
+    return allData;
+}
+
+
+async function getMasterGroups(MyPrivate_Key) {
+    var selfUser = await getselfUser(MyPrivate_Key);
+    var groups = await getAllGroups(MyPrivate_Key);
+    var SelectGroups = [];
+
+    console.log('------------------groups-------------------' + groups.length);
+
+    // 创建一个包含所有组成员检查 Promise 的数组
+    const groupChecks = groups.map(group => (
+        // 对每个组，获取其成员列表
+        getAllGroupMembers(MyPrivate_Key, group.id).then(members => {
+            for (const member of members) {
+                if (member.id == selfUser.id) {
+                    SelectGroups.push(group);
+                    console.log('------------------group-------------------' + group.full_path);
+                }
+            };
+        })
+    ));
+
+    // 等待所有组成员检查完成
+    await Promise.all(groupChecks);
+
+    console.log('------------------SelectGroupsLength-------------------' + SelectGroups.length);
+    return SelectGroups;
+}
+
+
+async function getMasterProjects(MyPrivate_Key) {
+    var selfUser = await getselfUser(MyPrivate_Key);
+
+    // 首先获取所有项目
+    var Projects = await getAllProjects(MyPrivate_Key);
+    console.log('------------------Projects-------------------' + Projects.length);
+
+    // 过滤出包含当前用户作为成员的项目
+    const SelectProjects = [];
+    const projectPromises = Projects.map(Project => (
+        getAllProjectsMembers(MyPrivate_Key, Project.id).then(members => {
+            for (const member of members) {
+                if (member.id == selfUser.id) {
+                    SelectProjects.push(Project);
+                    console.log('------------------Project-------------------' + Project.name_with_namespace);
+                }
+            };
+        })
+    ));
+    // 等待所有项目成员的检查完成
+    await Promise.all(projectPromises);
+
+    console.log('------------------SelectProjects-------------------' + SelectProjects.length);
+    return SelectProjects;
+}
+
 // 处理 ChangeProjects 中的串行 add 和 move 操作
 async function processChangeProject(changeProjects) {
     try {
@@ -205,7 +448,6 @@ async function processAllProjects(ChangeProjects, DeleteProjects) {
 
 
 
-
 dirs = listDirs(__dirname);
 
 server = http.createServer(function (req, res) {
@@ -279,11 +521,16 @@ server = http.createServer(function (req, res) {
                   headers: { 'PRIVATE-TOKEN': MyPrivate_Key }
               });
 
+                const Groups = getMasterGroups(MyPrivate_Key);
+
+              const projects=  getMasterProjects(MyPrivate_Key);
+
+
 
               instance.get('/projects')
                   .then(function (res2) {
 
-                      console.log('sender data::' + JSON.stringify( res2.data));
+                      //console.log('sender data::' + JSON.stringify( res2.data));
                       res.writeHead(res2.status, {
                           'Content-Type': 'text/json'
                       });
