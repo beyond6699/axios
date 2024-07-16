@@ -181,7 +181,7 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">私人令牌</span>
-                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username" aria-describedby="basic-addon1"required>
+                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username"value="YROE0T1Cn9YLGGlg97yD" aria-describedby="basic-addon1"required>
                 <div id="feedback1" class="invalid-feedback">
                     请输入Private_Key
                 </div>
@@ -212,11 +212,11 @@
                                 <label class="form-check-label" for="All1">移除权限</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="All2" type="radio" name="exampleRadio" value="on2">
+                                <input class="form-check-input" id="All2" type="radio" name="exampleRadio" value="on2"checked>
                                 <label class="form-check-label" for="All2">保留权限</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="All3" type="radio" name="exampleRadio" value="on3" checked>
+                                <input class="form-check-input" id="All3" type="radio" name="exampleRadio" value="on3" >
                                 <label class="form-check-label" for="All3">转移权限</label>
                             </div>
                         </form>
@@ -225,7 +225,7 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">转移人ID</span>
-                <input type="text" class="form-control" id="transformID" placeholder="请输入转移人ID" aria-label="Username" aria-describedby="basic-addon1" <!--value="leoxzhou"--> required>
+                <input type="text" class="form-control" id="transformID" placeholder="请输入转移人ID" aria-label="Username" aria-describedby="basic-addon1" value="leoxzhou" required>
                 <div id="feedback2" class="invalid-feedback">
                     请输入转移人ID
                 </div>
@@ -287,7 +287,7 @@
 
     <script>
 
-        function addListItem(text, detailText, projectid) {
+        function addListItem(text, detailText, projectid,bProject) {
             // 获取现有的列表组元素
             var listGroup = document.querySelector('.list-group');
 
@@ -312,14 +312,19 @@
                 input.className = 'form-check-input';
                 input.type = 'radio';
                 input.name = text + 'Radio';
-                input.id = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid;
+                input.id = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid + '__RadioSelect__' + (bProject?1:0);
                 input.value = optionValue;
-                if (index === 2) input.setAttribute('checked', ''); // 默认选中第三个选项
+                if (index === 1) input.setAttribute('checked', ''); // 默认选中第二个选项
 
                 var label = document.createElement('label');
                 label.className = 'form-check-label';
-                label.htmlFor = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid;
+                label.htmlFor = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid + '__RadioSelect__' + (bProject ? 1 : 0);
                 label.textContent = Myname[index];
+                //if (index == 2 && !bProject) {
+                //    input.disabled = true;
+                //}
+
+
 
                 listItem.appendChild(input);
                 listItem.appendChild(label);
@@ -558,14 +563,16 @@
                     jsonObj.Private_Key = data;
                     axios.post('/post/server', jsonObj)
                         .then(function (res) {
-                            var size = Object.keys(res.data).length;
-                            output.className = 'container text-danger';
-                            output.innerHTML = '';
-                            if (size > 0) {
-                                res.data.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
+                            const GroupSize = res.data.AllGroups.length;
+                            const ProjectSize = res.data.AllProjects.length;
+                            if (GroupSize > 0 || ProjectSize>0 ) {
+                               // res.data.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
                                 removeAllButFirst();
-                                res.data.forEach(function (porject) {
-                                    addListItem(porject.name_with_namespace, porject.web_url, porject.id);
+                                res.data.AllProjects.forEach(function (porject) {
+                                    addListItem('项目:' + porject.name_with_namespace, porject.web_url, porject.id,true);
+                                });
+                                res.data.AllGroups.forEach(function (porject) {
+                                    addListItem('项目组:' + porject.full_path, porject.web_url, porject.id,false);
                                 });
                             }
                         })
@@ -631,7 +638,7 @@
                 // 遍历所有单选按钮并检查它们的状态
                 radioButtons.forEach(function (radioitem) {
 
-                    if (radioitem.value == 'options3') {
+                    if (radioitem.value == 'options3' && radioitem.disabled!=true) {
                         radioitem.checked = true;
                     };
                 });

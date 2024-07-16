@@ -1,4 +1,4 @@
-import fs from 'fs';
+ï»¿import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import minimist from 'minimist';
@@ -101,8 +101,8 @@ async function getProjects(Private_Key,page,per_page) {
 }
 async function getAllProjects(Private_Key) {
  
-    let page = 1; // ´ÓµÚÒ»Ò³¿ªÊ¼
-    let allData = []; // ´æ´¢ËùÓĞÊı¾İµÄÊı×é
+    let page = 1; // ä»ç¬¬ä¸€é¡µå¼€å§‹
+    let allData = []; // å­˜å‚¨æ‰€æœ‰æ•°æ®çš„æ•°ç»„
     while (true) {
         const response = await getProjects(Private_Key,page, 100); 
         allData = allData.concat(response); 
@@ -137,8 +137,8 @@ async function getProjectMembers(Private_Key, projectid, page, per_page) {
 }
 async function getAllProjectsMembers(Private_Key, projectid) {
 
-    let page = 1; // ´ÓµÚÒ»Ò³¿ªÊ¼
-    let allData = []; // ´æ´¢ËùÓĞÊı¾İµÄÊı×é
+    let page = 1; // ä»ç¬¬ä¸€é¡µå¼€å§‹
+    let allData = []; // å­˜å‚¨æ‰€æœ‰æ•°æ®çš„æ•°ç»„
     while (true) {
         const response = await getProjectMembers(Private_Key, projectid, page, 100);
         allData = allData.concat(response);
@@ -195,8 +195,8 @@ async function getGroups(Private_Key, page, per_page) {
 }
 async function getAllGroups(Private_Key) {
 
-    let page = 1; // ´ÓµÚÒ»Ò³¿ªÊ¼
-    let allData = []; // ´æ´¢ËùÓĞÊı¾İµÄÊı×é
+    let page = 1; // ä»ç¬¬ä¸€é¡µå¼€å§‹
+    let allData = []; // å­˜å‚¨æ‰€æœ‰æ•°æ®çš„æ•°ç»„
     while (true) {
         const response = await getGroups(Private_Key, page, 100);
         allData = allData.concat(response);
@@ -251,8 +251,8 @@ async function getGroupMembers(Private_Key, Groupid,page, per_page) {
 
 async function getAllGroupMembers(Private_Key, Groupid) {
 
-    let page = 1; // ´ÓµÚÒ»Ò³¿ªÊ¼
-    let allData = []; // ´æ´¢ËùÓĞÊı¾İµÄÊı×é
+    let page = 1; // ä»ç¬¬ä¸€é¡µå¼€å§‹
+    let allData = []; // å­˜å‚¨æ‰€æœ‰æ•°æ®çš„æ•°ç»„
     while (true) {
         const response = await getGroupMembers(Private_Key, Groupid, page, 100);
         allData = allData.concat(response);
@@ -272,9 +272,9 @@ async function getMasterGroups(MyPrivate_Key) {
 
     console.log('------------------groups-------------------' + groups.length);
 
-    // ´´½¨Ò»¸ö°üº¬ËùÓĞ×é³ÉÔ±¼ì²é Promise µÄÊı×é
+    // åˆ›å»ºä¸€ä¸ªåŒ…å«æ‰€æœ‰ç»„æˆå‘˜æ£€æŸ¥ Promise çš„æ•°ç»„
     const groupChecks = groups.map(group => (
-        // ¶ÔÃ¿¸ö×é£¬»ñÈ¡Æä³ÉÔ±ÁĞ±í
+        // å¯¹æ¯ä¸ªç»„ï¼Œè·å–å…¶æˆå‘˜åˆ—è¡¨
         getAllGroupMembers(MyPrivate_Key, group.id).then(members => {
             for (const member of members) {
                 if (member.id == selfUser.id) {
@@ -285,7 +285,7 @@ async function getMasterGroups(MyPrivate_Key) {
         })
     ));
 
-    // µÈ´ıËùÓĞ×é³ÉÔ±¼ì²éÍê³É
+    // ç­‰å¾…æ‰€æœ‰ç»„æˆå‘˜æ£€æŸ¥å®Œæˆ
     await Promise.all(groupChecks);
 
     console.log('------------------SelectGroupsLength-------------------' + SelectGroups.length);
@@ -296,11 +296,11 @@ async function getMasterGroups(MyPrivate_Key) {
 async function getMasterProjects(MyPrivate_Key) {
     var selfUser = await getselfUser(MyPrivate_Key);
 
-    // Ê×ÏÈ»ñÈ¡ËùÓĞÏîÄ¿
+    // é¦–å…ˆè·å–æ‰€æœ‰é¡¹ç›®
     var Projects = await getAllProjects(MyPrivate_Key);
     console.log('------------------Projects-------------------' + Projects.length);
 
-    // ¹ıÂË³ö°üº¬µ±Ç°ÓÃ»§×÷Îª³ÉÔ±µÄÏîÄ¿
+    // è¿‡æ»¤å‡ºåŒ…å«å½“å‰ç”¨æˆ·ä½œä¸ºæˆå‘˜çš„é¡¹ç›®
     const SelectProjects = [];
     const projectPromises = Projects.map(Project => (
         getAllProjectsMembers(MyPrivate_Key, Project.id).then(members => {
@@ -312,14 +312,21 @@ async function getMasterProjects(MyPrivate_Key) {
             };
         })
     ));
-    // µÈ´ıËùÓĞÏîÄ¿³ÉÔ±µÄ¼ì²éÍê³É
+    // ç­‰å¾…æ‰€æœ‰é¡¹ç›®æˆå‘˜çš„æ£€æŸ¥å®Œæˆ
     await Promise.all(projectPromises);
 
     console.log('------------------SelectProjects-------------------' + SelectProjects.length);
     return SelectProjects;
 }
+async function getMasterAll(MyPrivate_Key) {
+    const Groups = await getMasterGroups(MyPrivate_Key);
+    const projects = await getMasterProjects(MyPrivate_Key);
+    return{ AllGroups: Groups, AllProjects: projects };
+}
 
-// ´¦Àí ChangeProjects ÖĞµÄ´®ĞĞ add ºÍ move ²Ù×÷
+
+
+// å¤„ç† ChangeProjects ä¸­çš„ä¸²è¡Œ add å’Œ move æ“ä½œ
 async function processChangeProject(changeProjects) {
     try {
 
@@ -340,45 +347,45 @@ async function processChangeProject(changeProjects) {
             const addPromises = changeProjects.map(async (changeProject) => {
                 try {
                     console.log('addPromisesURL:::.' + `${ProjectAPIUrl}/${changeProject.projectid}/members`);
-                    console.log('addPromisespost:::.' + JSON.stringify({ id: changeProject.projectid, user_id: userResponse.data.id, access_level: 40 }));
+                    console.log('addPromisespost:::.' + JSON.stringify({ id: changeProject.projectid, user_id: userResponse.data.id, access_level: 50 }));
 
-                    // Ö´ĞĞ add ²Ù×÷
-                    const addResponse = await axios.post(`${ProjectAPIUrl}/${changeProject.projectid}/members`, { id: changeProject.projectid, user_id: userResponse.data.id, access_level: 40 }, config);
-                    // ¼ì²é add ²Ù×÷ÊÇ·ñ³É¹¦
+                    // æ‰§è¡Œ add æ“ä½œ
+                    const addResponse = await axios.post(`${ProjectAPIUrl}/${changeProject.projectid}/members`, { id: changeProject.projectid, user_id: userResponse.data.id, access_level: 50 }, config);
+                    // æ£€æŸ¥ add æ“ä½œæ˜¯å¦æˆåŠŸ
                     if (addResponse.status === 200) {
                         console.log('addResponseOK.' + JSON.stringify(addResponse.data));
-                        // Èç¹û add ³É¹¦£¬¿ÉÒÔÔÚÕâÀï´¦ÀíºóĞøÂß¼­
+                        // å¦‚æœ add æˆåŠŸï¼Œå¯ä»¥åœ¨è¿™é‡Œå¤„ç†åç»­é€»è¾‘
                         let changeProjectsin = [];
                         changeProjectsin.push(changeProject);
-                        return processDeleteProjects(changeProjectsin);
+                        return await processDeleteProjects(changeProjectsin);
                     } else {
-                        // Èç¹û add Ê§°Ü£¬·µ»ØÊ§°ÜµÄÏìÓ¦
+                        // å¦‚æœ add å¤±è´¥ï¼Œè¿”å›å¤±è´¥çš„å“åº”
                         console.log('ADDfailed.' + JSON.stringify(addResponse.data));
                         return { success: false, status: addResponse.status, data: addResponse.data };
                     }
                 } catch (error) {
-                    // ²¶»ñ²¢·µ»Ø´íÎóĞÅÏ¢
+                    // æ•è·å¹¶è¿”å›é”™è¯¯ä¿¡æ¯
                     console.error('Error in add operation:', error);
                     return { success: false, error: error.message };
                 }
             });
 
-            // µÈ´ıËùÓĞÇëÇóÍê³É
+            // ç­‰å¾…æ‰€æœ‰è¯·æ±‚å®Œæˆ
             const addResults = await Promise.all(addPromises);
-            return addResults.flat(); // ·µ»ØËùÓĞ²Ù×÷µÄ½á¹û
+            return addResults.flat(); // è¿”å›æ‰€æœ‰æ“ä½œçš„ç»“æœ
 
         }else {
-            // Èç¹û add Ê§°Ü£¬¿ÉÒÔÔÚÕâÀï´¦Àí´íÎó£¬ÀıÈç·µ»Ø´íÎóĞÅÏ¢»òÅ×³öÒì³£
+            // å¦‚æœ add å¤±è´¥ï¼Œå¯ä»¥åœ¨è¿™é‡Œå¤„ç†é”™è¯¯ï¼Œä¾‹å¦‚è¿”å›é”™è¯¯ä¿¡æ¯æˆ–æŠ›å‡ºå¼‚å¸¸
             throw new Error('Add operation failed');
         }
     } catch (error) {
-        // ´¦Àí¿ÉÄÜ³öÏÖµÄ´íÎó
+        // å¤„ç†å¯èƒ½å‡ºç°çš„é”™è¯¯
        // console.error('Error processing change project:', error);
-        throw error; // ¿ÉÒÔÖØĞÂÅ×³ö´íÎó»ò½øĞĞÆäËû´íÎó´¦Àí
+        throw error; // å¯ä»¥é‡æ–°æŠ›å‡ºé”™è¯¯æˆ–è¿›è¡Œå…¶ä»–é”™è¯¯å¤„ç†
     }
 }
 
-// ´¦Àí DeleteProjects ÖĞµÄ²¢ĞĞ delete ²Ù×÷
+// å¤„ç† DeleteProjects ä¸­çš„å¹¶è¡Œ delete æ“ä½œ
 async function processDeleteProjects(projects) {
     try {
         const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
@@ -390,57 +397,183 @@ async function processDeleteProjects(projects) {
                 'Content-Type':'application/json',
             }
         };
-        // Ê×ÏÈ»ñÈ¡ÓÃ»§id
+        // é¦–å…ˆè·å–ç”¨æˆ·id
         const getUserResponse = await axios.get(UserAPIUrl,config);
         if (getUserResponse && getUserResponse.status==200) {
-            //Èç¹û³É¹¦»ñµÃid
+            //å¦‚æœæˆåŠŸè·å¾—id
             console.log('getUserResponseOK.' + JSON.stringify(getUserResponse.data));
 
             const deletePromises = projects.map((project) => {
-                // ·µ»ØÒ»¸ö Promise£¬²»ÂÛ³É¹¦»òÊ§°Ü
+                // è¿”å›ä¸€ä¸ª Promiseï¼Œä¸è®ºæˆåŠŸæˆ–å¤±è´¥
                 return new Promise(async (resolve) => {
                     try {
                         const DeleteResponse = await axios.delete(`${ProjectAPIUrl}/${project.projectid}/members/${getUserResponse.data.id}`, config);
-                        console.log('deleteOK:', JSON.stringify(DeleteResponse.data));
-                        resolve({ success: true, error: DeleteResponse.data}); // ½â¾ö Promise£¬²¢·µ»Ø³É¹¦µÄÏìÓ¦
+                        console.log('deleteOK:');
+                        resolve({ success: true, error: ''}); // è§£å†³ Promiseï¼Œå¹¶è¿”å›æˆåŠŸçš„å“åº”
                     } catch (error) {
                         console.error('deletefailed:', error.response ? error.response.data : error.message);
-                        resolve({ success: false, error: error.response ? error.response.data : error.message }); // ½â¾ö Promise£¬²¢·µ»ØÊ§°ÜµÄÏìÓ¦
+                        resolve({ success: false, error: error.response ? error.response.data : error.message }); // è§£å†³ Promiseï¼Œå¹¶è¿”å›å¤±è´¥çš„å“åº”
                     }
                 });
             });
 
             const deleteResults = await Promise.all(deletePromises);
-            return deleteResults; // ·µ»ØËùÓĞÉ¾³ı²Ù×÷µÄ½á¹û
+            return deleteResults; // è¿”å›æ‰€æœ‰åˆ é™¤æ“ä½œçš„ç»“æœ
         } else {
-            throw new Error('Get User Info Faild£¡' + JSON.stringify(getUserResponse.data));
+            throw new Error('Get User Info Faildï¼' + JSON.stringify(getUserResponse.data));
         }
     } catch (error) {
         throw error;
     }
 }
 
-// ´¦ÀíËùÓĞÏîÄ¿µÄÖ÷º¯Êı
-async function processAllProjects(ChangeProjects, DeleteProjects) {
+
+
+
+// å¤„ç† ChangeProjects ä¸­çš„ä¸²è¡Œ add å’Œ move æ“ä½œ
+async function processChangeGroup(changeGroups) {
     try {
-        // ´¦Àí ChangeProjects µÄ´®ĞĞ add ºÍ move ²Ù×÷
+
+        const UsersAPIUrl = 'https://git.code.tencent.com/api/v3/users';
+        const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
+        const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/groups';
+
+        const config = {
+            headers: {
+                'PRIVATE-TOKEN': changeGroups[0].Private_Key,
+                'Content-Type': 'application/json',
+            }
+        };
+        const userResponse = await axios.get(`${UsersAPIUrl}/${changeGroups[0].transformid}`, config);
+        if (userResponse && userResponse.status == 200) {
+            console.log('GetuserIDOK.' + JSON.stringify(userResponse.data));
+
+            const addPromises = changeGroups.map(async (changeGroup) => {
+
+                try {
+                    console.log('addPromisesURL:::.' + `${groupsAPIUrl}/${changeGroup.projectid}/members`);
+                    console.log('addPromisespost:::.' + JSON.stringify({ id: changeGroup.projectid, user_id: userResponse.data.id, access_level: 50 }));
+
+                    // æ‰§è¡Œ add æ“ä½œ
+                    const addResponse = await axios.post(`${groupsAPIUrl}/${changeGroup.projectid}/members`, { id: changeGroup.projectid, user_id: userResponse.data.id, access_level: 50 }, config)
+                    if (addResponse) {
+                        console.log('addResponseOK.' + JSON.stringify(addResponse.data));
+                        // å¦‚æœ add æˆåŠŸï¼Œå¯ä»¥åœ¨è¿™é‡Œå¤„ç†åç»­é€»è¾‘
+                        const deleteResults = await processDeleteGroups([changeGroup]);
+                        return deleteResults;
+                    } else {
+                        // å¦‚æœ add å¤±è´¥ï¼Œè¿”å›å¤±è´¥çš„å“åº”
+                        console.log('ADDfailed.' + JSON.stringify(addResponse.data));
+                        return { success: false, status: addResponse.status, data: addResponse.data };
+                    }
+                      
+                } catch (error) {
+
+                    if (error.response.status == 409) {
+                        // å¦‚æœ å·²ç»æ·»åŠ è¿‡ 409 é”™è¯¯ å¯ä»¥åœ¨è¿™é‡Œå¤„ç†åç»­é€»è¾‘
+                        const deleteResults = await processDeleteGroups([changeGroup]);
+                        return deleteResults;
+                    } else {
+                        // æ•è·å¹¶è¿”å›é”™è¯¯ä¿¡æ¯
+                        console.error('addPromises:', error.response ? error.response.data : error.message);
+                        return{ success: false, error: error.response ? error.response.data : error.message }; // è§£å†³ Promiseï¼Œå¹¶è¿”å›å¤±è´¥çš„å“åº”
+                    }
+                }
+            });
+
+            // ç­‰å¾…æ‰€æœ‰è¯·æ±‚å®Œæˆ
+            const addResults = await Promise.all(addPromises);
+            return addResults.flat(); // è¿”å›æ‰€æœ‰æ“ä½œçš„ç»“æœ
+
+        } else {
+            // å¦‚æœ add å¤±è´¥ï¼Œå¯ä»¥åœ¨è¿™é‡Œå¤„ç†é”™è¯¯ï¼Œä¾‹å¦‚è¿”å›é”™è¯¯ä¿¡æ¯æˆ–æŠ›å‡ºå¼‚å¸¸
+            throw new Error('Add operation failed');
+        }
+    } catch (error) {
+        // å¤„ç†å¯èƒ½å‡ºç°çš„é”™è¯¯
+        // console.error('Error processing change project:', error);
+        throw error; // å¯ä»¥é‡æ–°æŠ›å‡ºé”™è¯¯æˆ–è¿›è¡Œå…¶ä»–é”™è¯¯å¤„ç†
+    }
+}
+
+
+// å¤„ç† DeleteGroups ä¸­çš„å¹¶è¡Œ delete æ“ä½œ
+async function processDeleteGroups(Groups) {
+    try {
+        const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
+        const ProjectAPIUrl = 'https://git.code.tencent.com/api/v3/groups';
+
+        const config = {
+            headers: {
+                'PRIVATE-TOKEN': Groups[0].Private_Key,
+                'Content-Type': 'application/json',
+            }
+        };
+        // é¦–å…ˆè·å–ç”¨æˆ·id
+        const getUserResponse = await axios.get(UserAPIUrl, config);
+        if (getUserResponse && getUserResponse.status == 200) {
+            //å¦‚æœæˆåŠŸè·å¾—id
+            console.log('getUserResponseOK.' + JSON.stringify(getUserResponse.data));
+
+            const deletePromises = Groups.map((Group) => {
+                // è¿”å›ä¸€ä¸ª Promiseï¼Œä¸è®ºæˆåŠŸæˆ–å¤±è´¥
+                return new Promise(async (resolve) => {
+                const DeleteResponse = await axios.delete(`${ProjectAPIUrl}/${Group.projectid}/members/${getUserResponse.data.id}`, config)
+                    .then((results) => {
+                        console.log('deleteOK:', JSON.stringify(results.data));
+                        resolve({ success: true, error: results.data }); // è§£å†³ Promiseï¼Œå¹¶è¿”å›æˆåŠŸçš„å“åº”
+                    })
+                    .catch((error) => {
+                        console.error('deletefailed:', error.response ? error.response.data : error.message);
+
+                        if (error.response &&error.response.status == 403) {
+                            resolve({ success: false, error: error.response.data, message:'å¸å·å¹¶æ²¡æœ‰è¯¥æ“ä½œçš„æƒé™æˆ–è€…é¡¹ç›®è®¾ç½®ä¸å…è®¸è¯¥æ“ä½œ'  }); // è§£å†³ Promiseï¼Œå¹¶è¿”å›å¤±è´¥çš„å“åº”
+                        } else {
+                            resolve({ success: false, error: error.response ? error.response.data : error.message }); // è§£å†³ Promiseï¼Œå¹¶è¿”å›å¤±è´¥çš„å“åº”
+                        }
+                    });
+                });
+            });
+
+            const deleteResults = await Promise.all(deletePromises);
+            return deleteResults; // è¿”å›æ‰€æœ‰åˆ é™¤æ“ä½œçš„ç»“æœ
+        } else {
+            throw new Error('Get User Info Faildï¼' + JSON.stringify(getUserResponse.data));
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+// å¤„ç†æ‰€æœ‰é¡¹ç›®çš„ä¸»å‡½æ•°
+async function processAllProjects(ChangeProjects, DeleteProjects, ChangeGroups, DeleteGroups) {
+    try {
+        // å¤„ç† ChangeProjects çš„ä¸²è¡Œ add å’Œ move æ“ä½œ
         let MychangeResults=[];
         if (ChangeProjects.length > 0) {
             MychangeResults = await processChangeProject(ChangeProjects);
         }
 
-        // ²¢ĞĞ´¦Àí DeleteProjects µÄ delete ²Ù×÷
+        // å¹¶è¡Œå¤„ç† DeleteProjects çš„ delete æ“ä½œ
         let MydeleteResults = [];
         if (DeleteProjects.length > 0) {
              MydeleteResults = await processDeleteProjects(DeleteProjects);
         }
-        // ·µ»ØËùÓĞ²Ù×÷µÄ½á¹û
+        let MyChangeGroupsResults = [];
+        if (ChangeGroups.length > 0) {
+            MyChangeGroupsResults = await processChangeGroup(ChangeGroups);
+        }
+        let MyDeleteGroupsResults = [];
+        if (DeleteGroups.length > 0) {
+            MyDeleteGroupsResults = await processDeleteGroups(DeleteGroups);
+        }
+        // è¿”å›æ‰€æœ‰æ“ä½œçš„ç»“æœ
         return {
-            changeResults:MychangeResults,
-            deleteResults:MydeleteResults
+            changeResults: MychangeResults.concat(MyChangeGroupsResults),
+            deleteResults: MydeleteResults.concat(MyDeleteGroupsResults)
         };
     } catch (error) {
-        // ´¦Àí´íÎó
+        // å¤„ç†é”™è¯¯
       //  console.error('Error processing all projects:', error);
         throw error;
     }
@@ -509,60 +642,35 @@ server = http.createServer(function (req, res) {
         req.on('end', function () {
 
             try {
-              console.log('POST data received' + data);
+                console.log('POST data received' + data);
+                const jsonobj = JSON.parse(data);
+                const MyPrivate_Key = jsonobj.Private_Key;
+                getMasterAll(MyPrivate_Key)
+                    .then((results) => {
+                        res.writeHead(200, {
+                            'Content-Type': 'text/json'
+                        });
+                        const outString = JSON.stringify(results);
+                        res.write(outString);
+                        res.end();
+                    })
+                    .catch((error) => {
+                        if (error.response) {
+                            res.writeHead(error.response.status, error.response.headers);
+                            res.write(JSON.stringify(error.response.data));
+                            res.end();
 
-              var jsonobj = JSON.parse(data);
-              var MyPrivate_Key = jsonobj.Private_Key;
+                        } else if (error.request) {
+                            send404(res);
+                        } else {
+                            console.log('Error', error.message);
+                            send404(res);
+                        }
+                        console.log(error.config);
+                    });
 
-
-              const instance = axios.create({
-                  baseURL: 'https://git.code.tencent.com/api/v3/',
-                  timeout: 1000,
-                  headers: { 'PRIVATE-TOKEN': MyPrivate_Key }
-              });
-
-                const Groups = getMasterGroups(MyPrivate_Key);
-
-              const projects=  getMasterProjects(MyPrivate_Key);
-
-
-
-              instance.get('/projects')
-                  .then(function (res2) {
-
-                      //console.log('sender data::' + JSON.stringify( res2.data));
-                      res.writeHead(res2.status, {
-                          'Content-Type': 'text/json'
-                      });
-                      res.write(JSON.stringify(res2.data));
-                      res.end();
-
-                  })
-                  .catch(function (error) {
-
-                      if (error.response) {
-
-
-                          res.writeHead(error.response.status, error.response.headers);
-                          res.write(JSON.stringify(error.response.data));
-                          res.end();
-
-                      } else if (error.request) {
-                          // ÇëÇóÒÑ¾­³É¹¦·¢Æğ£¬µ«Ã»ÓĞÊÕµ½ÏìÓ¦
-                          // `error.request` ÔÚä¯ÀÀÆ÷ÖĞÊÇ XMLHttpRequest µÄÊµÀı£¬
-                          // ¶øÔÚnode.jsÖĞÊÇ http.ClientRequest µÄÊµÀı
-                          //console.log(error.request);
-                          send404(res);
-                      } else {
-                          // ·¢ËÍÇëÇóÊ±³öÁËµãÎÊÌâ
-                          console.log('Error', error.message);
-                          send404(res);
-                      }
-                      console.log(error.config);
-
-                  });
             } catch (error) {
-                // Èç¹û½âÎö JSON Ê§°Ü»òÆäËü´íÎó£¬·¢ËÍ´íÎóÏìÓ¦
+                // å¦‚æœè§£æ JSON å¤±è´¥æˆ–å…¶å®ƒé”™è¯¯ï¼Œå‘é€é”™è¯¯å“åº”
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ success: false, error: error.message }));
                 console.error('Error parsing JSON or processing data:', error);
@@ -582,60 +690,66 @@ server = http.createServer(function (req, res) {
           try {
           console.log('POST data received' + data);
 
-          var jsonobj = JSON.parse(data);
-          var MyPrivate_Key = jsonobj.Private_Key;
-          var slelectinf = jsonobj.slelectinf;
-          var transformid = jsonobj.transformid;
-          var ChangeProjects = [];
-          var DeleteProjects = [];
-          //ÕûÀíÒ»ÏÂÊı¾İ´¢´æÏÂÀ´
-          slelectinf.forEach(function (porject) {
+              var jsonobj = JSON.parse(data);
+              var MyPrivate_Key = jsonobj.Private_Key;
+              var slelectinf = jsonobj.slelectinf;
+              var transformid = jsonobj.transformid;
+              var ChangeProjects = [];
+              var DeleteProjects = [];
+              var ChangeGroups = [];
+              var DeleteGroups = [];
+          //æ•´ç†ä¸€ä¸‹æ•°æ®å‚¨å­˜ä¸‹æ¥
+              slelectinf.forEach(function (porject) {
+
 
               var parts = porject.id.split('__RadioSelect__');
               var SaveInfo = {};
               SaveInfo.id = parts[0];
               SaveInfo.index = parts[1];
               SaveInfo.projectid = parts[2];
+              SaveInfo.bProject = parts[3];
               SaveInfo.Private_Key = MyPrivate_Key;
               SaveInfo.transformid = transformid;
-              if (porject.checked == true && parts[1] == 3) {
+              if (porject.checked == true && parts[1] == 3 && parts[3]==1) {
                   ChangeProjects.push(SaveInfo);
-              } else if (porject.checked == true && parts[1] == 1) {
+              } else if (porject.checked == true && parts[1] == 1 && parts[3]==1) {
                   DeleteProjects.push(SaveInfo);
+              } else if (porject.checked == true && parts[1] == 3 && parts[3] == 0) {
+                  ChangeGroups.push(SaveInfo);
+              } else if (porject.checked == true && parts[1] == 1 && parts[3] == 0) {
+                  DeleteGroups.push(SaveInfo);
               }
           });
-          console.log('ChangeProjects : ' + ChangeProjects.length);
-          console.log('DeleteProjects : ' + DeleteProjects.length);
-
-          // ´¦ÀíËùÓĞÏîÄ¿£¬²¢ÔÚÍê³Éºó·¢ËÍÏìÓ¦
-          processAllProjects(ChangeProjects, DeleteProjects)
-              .then((results) => {
-                  // ½«½á¹û×ª»»Îª×Ö·û´®
+              console.log('ChangeProjects : ' + ChangeProjects.length);
+              console.log('DeleteProjects : ' + DeleteProjects.length);
+              console.log('ChangeGroups : ' + ChangeGroups.length);
+              console.log('DeleteGroups : ' + DeleteGroups.length);
+          // å¤„ç†æ‰€æœ‰é¡¹ç›®ï¼Œå¹¶åœ¨å®Œæˆåå‘é€å“åº”
+              processAllProjects(ChangeProjects, DeleteProjects, ChangeGroups, DeleteGroups)
+                  .then((results) => {
+                  // å°†ç»“æœè½¬æ¢ä¸ºå­—ç¬¦ä¸²
                  // const resultString = 'test';
                   const resultString = JSON.stringify(results);
-
                   console.log('log:processAllProjectsDone:', resultString);
-                  // ÉèÖÃÏìÓ¦Í·
+                  // è®¾ç½®å“åº”å¤´
                   res.writeHead(200, { 'Content-Type': 'application/json' });
                   res.write(resultString);
-                  // ·¢ËÍÏìÓ¦Êı¾İ
+                  // å‘é€å“åº”æ•°æ®
                   res.end();
                 //  console.log('Results of all projects sent:', results);
-              })
-              .catch((error) => {
-                  // ·¢ËÍ´íÎóÏìÓ¦
-                  console.error('ERROR:processAllProjects:', error.message);
-                  res.writeHead(500, { 'Content-Type': 'application/json' });
-                  res.end(JSON.stringify({ success: false, error: error.message }));
-              });
-
+                  })
+                  .catch((error) => {
+                  // å‘é€é”™è¯¯å“åº”
+                      console.error('ERROR:processAllProjects:', error.message);
+                      res.writeHead(500, { 'Content-Type': 'application/json' });
+                      res.end(JSON.stringify({ success: false, error: error.message }));
+                  });
           } catch (error) {
-              // Èç¹û½âÎö JSON Ê§°Ü»òÆäËü´íÎó£¬·¢ËÍ´íÎóÏìÓ¦
+              // å¦‚æœè§£æ JSON å¤±è´¥æˆ–å…¶å®ƒé”™è¯¯ï¼Œå‘é€é”™è¯¯å“åº”
               console.error('Error parsing JSON or processing data:', error.message);
               res.writeHead(400, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify({ success: false, error: error.message }));
           }
-
       });
   } else {
     send404(res);
