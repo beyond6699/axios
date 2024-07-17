@@ -171,6 +171,37 @@ async function getAllProjectsMembers(Private_Key, projectid) {
 //    return out;
 //}
 
+//async function getUserInfo(Private_Key, UserID) {
+//    const APIUrl = 'https://git.code.tencent.com/api/v3/users';
+//    var out = {
+//        success: false,
+//        message: '',
+//        data: {}
+//    };
+//    const config = {
+//        headers: {
+//            'PRIVATE-TOKEN': Private_Key,
+//            'Content-Type': 'application/json',
+//        }
+//    };
+
+//    const Response = await await axios.get(`${APIUrl}/${UserID}`, config)
+//    if (Response && Response.status === 200) {
+//        out.success = true;
+//        out.data = Response.data;
+//    } else {
+//        out.success = true;
+//        out.message = JSON.stringify(Response.data);
+//        console.log('getUserInfo. failed' + JSON.stringify(out.message));
+//    }
+//    return out;
+//}
+
+
+
+
+
+
 
 async function getGroups(Private_Key, page, per_page) {
     const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/groups';
@@ -331,7 +362,6 @@ async function processChangeProject(changeProjects) {
     try {
 
         const UsersAPIUrl = 'https://git.code.tencent.com/api/v3/users';
-        const UserAPIUrl = 'https://git.code.tencent.com/api/v3/user';
         const ProjectAPIUrl = 'https://git.code.tencent.com/api/v3/projects';
 
         const config = {
@@ -347,10 +377,10 @@ async function processChangeProject(changeProjects) {
             const addPromises = changeProjects.map(async (changeProject) => {
                 try {
                     console.log('addPromisesURL:::.' + `${ProjectAPIUrl}/${changeProject.projectid}/members`);
-                    console.log('addPromisespost:::.' + JSON.stringify({ id: changeProject.projectid, user_id: userResponse.data.id, access_level: 50 }));
+                    console.log('addPromisespost:::.' + JSON.stringify({ id: changeProject.projectid, user_id: userResponse.data.id, access_level: 40 }));
 
                     // 执行 add 操作
-                    const addResponse = await axios.post(`${ProjectAPIUrl}/${changeProject.projectid}/members`, { id: changeProject.projectid, user_id: userResponse.data.id, access_level: 50 }, config);
+                    const addResponse = await axios.post(`${ProjectAPIUrl}/${changeProject.projectid}/members`, { id: changeProject.projectid, user_id: userResponse.data.id, access_level: 40 }, config);
                     // 检查 add 操作是否成功
                     if (addResponse.status === 200) {
                         console.log('addResponseOK.' + JSON.stringify(addResponse.data));
@@ -375,13 +405,14 @@ async function processChangeProject(changeProjects) {
             return addResults.flat(); // 返回所有操作的结果
 
         }else {
-            // 如果 add 失败，可以在这里处理错误，例如返回错误信息或抛出异常
-            throw new Error('Add operation failed');
+            // 捕获并返回错误信息
+            console.error('processChangeProject1:', error.response ? error.response.data : error.message);
+            return [{ success: false, error: error.response ? error.response.data : error.message }]; // 解决 Promise，并返回失败的响应
         }
     } catch (error) {
-        // 处理可能出现的错误
-       // console.error('Error processing change project:', error);
-        throw error; // 可以重新抛出错误或进行其他错误处理
+        // 捕获并返回错误信息
+        console.error('processChangeProject2:', error.response ? error.response.data : error.message);
+        return [{ success: false, error: error.response ? error.response.data : error.message }]; // 解决 Promise，并返回失败的响应
     }
 }
 
@@ -412,7 +443,7 @@ async function processDeleteProjects(projects) {
                         resolve({ success: true, error: ''}); // 解决 Promise，并返回成功的响应
                     } catch (error) {
                         console.error('deletefailed:', error.response ? error.response.data : error.message);
-                        resolve({ success: false, error: error.response ? error.response.data : error.message }); // 解决 Promise，并返回失败的响应
+                        resolve({ success: false, error: error.response ? error.response.data : error.message }); 
                     }
                 });
             });
@@ -420,10 +451,14 @@ async function processDeleteProjects(projects) {
             const deleteResults = await Promise.all(deletePromises);
             return deleteResults; // 返回所有删除操作的结果
         } else {
-            throw new Error('Get User Info Faild！' + JSON.stringify(getUserResponse.data));
+            // 捕获并返回错误信息
+            console.error('Get User Info Faild:', JSON.stringify(getUserResponse.data));
+            return [{ success: false, error: JSON.stringify(getUserResponse.data) }]; 
         }
     } catch (error) {
-        throw error;
+        // 捕获并返回错误信息
+        console.error('processDeleteProjects:', error.response ? error.response.data : error.message);
+        return [{ success: false, error: error.response ? error.response.data : error.message }]; 
     }
 }
 
@@ -456,19 +491,11 @@ async function processChangeGroup(changeGroups) {
 
                     // 执行 add 操作
                     const addResponse = await axios.post(`${groupsAPIUrl}/${changeGroup.projectid}/members`, { id: changeGroup.projectid, user_id: userResponse.data.id, access_level: 50 }, config)
-                    if (addResponse) {
-                        console.log('addResponseOK.' + JSON.stringify(addResponse.data));
-                        // 如果 add 成功，可以在这里处理后续逻辑
-                        const deleteResults = await processDeleteGroups([changeGroup]);
-                        return deleteResults;
-                    } else {
-                        // 如果 add 失败，返回失败的响应
-                        console.log('ADDfailed.' + JSON.stringify(addResponse.data));
-                        return { success: false, status: addResponse.status, data: addResponse.data };
-                    }
+                    console.log('addResponse.' + JSON.stringify(addResponse.data));
+                    const deleteResults = await processDeleteGroups([changeGroup]);
+                    return deleteResults;
                       
                 } catch (error) {
-
                     if (error.response.status == 409) {
                         // 如果 已经添加过 409 错误 可以在这里处理后续逻辑
                         const deleteResults = await processDeleteGroups([changeGroup]);
@@ -486,13 +513,15 @@ async function processChangeGroup(changeGroups) {
             return addResults.flat(); // 返回所有操作的结果
 
         } else {
-            // 如果 add 失败，可以在这里处理错误，例如返回错误信息或抛出异常
-            throw new Error('Add operation failed');
+
+            // 捕获并返回错误信息
+            console.error('processChangeGroup1:', error.response ? error.response.data : error.message);
+            return [{ success: false, error: error.response ? error.response.data : error.message }]; // 解决 Promise，并返回失败的响应
         }
     } catch (error) {
-        // 处理可能出现的错误
-        // console.error('Error processing change project:', error);
-        throw error; // 可以重新抛出错误或进行其他错误处理
+        // 捕获并返回错误信息
+        console.error('processChangeGroup2:', error.response ? error.response.data : error.message);
+        return [{ success: false, error: error.response ? error.response.data : error.message }]; // 解决 Promise，并返回失败的响应
     }
 }
 
@@ -510,6 +539,8 @@ async function processDeleteGroups(Groups) {
             }
         };
         // 首先获取用户id
+        console.log('processDeleteGroups1111111111.');
+
         const getUserResponse = await axios.get(UserAPIUrl, config);
         if (getUserResponse && getUserResponse.status == 200) {
             //如果成功获得id
@@ -518,7 +549,7 @@ async function processDeleteGroups(Groups) {
             const deletePromises = Groups.map((Group) => {
                 // 返回一个 Promise，不论成功或失败
                 return new Promise(async (resolve) => {
-                const DeleteResponse = await axios.delete(`${ProjectAPIUrl}/${Group.projectid}/members/${getUserResponse.data.id}`, config)
+                await axios.delete(`${ProjectAPIUrl}/${Group.projectid}/members/${getUserResponse.data.id}`, config)
                     .then((results) => {
                         console.log('deleteOK:', JSON.stringify(results.data));
                         resolve({ success: true, error: results.data }); // 解决 Promise，并返回成功的响应
@@ -538,10 +569,14 @@ async function processDeleteGroups(Groups) {
             const deleteResults = await Promise.all(deletePromises);
             return deleteResults; // 返回所有删除操作的结果
         } else {
-            throw new Error('Get User Info Faild！' + JSON.stringify(getUserResponse.data));
+            // 捕获并返回错误信息
+            console.error('Get User Info FaildGroups:', JSON.stringify(getUserResponse.data));
+            return [{ success: false, error: JSON.stringify(getUserResponse.data) }];
         }
     } catch (error) {
-        throw error;
+        // 捕获并返回错误信息
+        console.error('processDeleteGroups:', error.response ? error.response.data : error.message);
+        return [{ success: false, error: error.response ? error.response.data : error.message }];
     }
 }
 

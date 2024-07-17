@@ -149,7 +149,11 @@
         </ul>
     </div>
 
-
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="arrow-right-circle" viewBox="0 0 16 16">
             <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
@@ -181,7 +185,7 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">私人令牌</span>
-                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username"value="YROE0T1Cn9YLGGlg97yD" aria-describedby="basic-addon1"required>
+                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username" value="" aria-describedby="basic-addon1" required>
                 <div id="feedback1" class="invalid-feedback">
                     请输入Private_Key
                 </div>
@@ -207,17 +211,17 @@
                         </span>
 
                         <form>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="All1" type="radio" name="exampleRadio" value="on1">
-                                <label class="form-check-label" for="All1">移除权限</label>
+                            <div class="form-check form-check-inline ">
+                                <input class="form-check-input hidden" id="All1" type="radio" name="exampleRadio" value="on1">
+                                <label class="form-check-label hidden" for="All1">移除权限</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="All2" type="radio" name="exampleRadio" value="on2"checked>
+                                <input class="form-check-input" id="All2" type="radio" name="exampleRadio" value="on2" checked>
                                 <label class="form-check-label" for="All2">保留权限</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="All3" type="radio" name="exampleRadio" value="on3" >
-                                <label class="form-check-label" for="All3">转移权限</label>
+                                <input class="form-check-input" id="All3" type="radio" name="exampleRadio" value="on3">
+                                <label class="form-check-label" for="All3">移除权限</label>
                             </div>
                         </form>
                     </label>
@@ -225,7 +229,7 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">转移人ID</span>
-                <input type="text" class="form-control" id="transformID" placeholder="请输入转移人ID" aria-label="Username" aria-describedby="basic-addon1" value="leoxzhou" required>
+                <input type="text" class="form-control" id="transformID" placeholder="请输入转移人ID" aria-label="Username" aria-describedby="basic-addon1" value="" required>
                 <div id="feedback2" class="invalid-feedback">
                     请输入转移人ID
                 </div>
@@ -246,7 +250,7 @@
                     <h5 class="modal-title" id="exampleModalLabel">项目权限修改</h5>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body"id="modal-boly1">
+                <div class="modal-body" id="modal-boly1">
 
                 </div>
                 <div class="modal-footer">
@@ -287,7 +291,7 @@
 
     <script>
 
-        function addListItem(text, detailText, projectid,bProject) {
+        function addListItem(text, detailText, projectid, bProject) {
             // 获取现有的列表组元素
             var listGroup = document.querySelector('.list-group');
 
@@ -303,7 +307,7 @@
 
             // 为每个选项创建一个<li>元素，并添加到列表中
             var options = ['options1', 'options2', 'options3'];
-            var Myname = ['移除权限', '保留权限', '转移权限'];
+            var Myname = ['移除权限', '保留权限', '移除权限'];
             options.forEach(function (optionValue, index) {
                 var listItem = document.createElement('div');
                 listItem.className = 'form-check form-check-inline';
@@ -312,10 +316,9 @@
                 input.className = 'form-check-input';
                 input.type = 'radio';
                 input.name = text + 'Radio';
-                input.id = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid + '__RadioSelect__' + (bProject?1:0);
+                input.id = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid + '__RadioSelect__' + (bProject ? 1 : 0);
                 input.value = optionValue;
                 if (index === 1) input.setAttribute('checked', ''); // 默认选中第二个选项
-
                 var label = document.createElement('label');
                 label.className = 'form-check-label';
                 label.htmlFor = text + '__RadioSelect__' + (index + 1) + '__RadioSelect__' + projectid + '__RadioSelect__' + (bProject ? 1 : 0);
@@ -323,7 +326,10 @@
                 //if (index == 2 && !bProject) {
                 //    input.disabled = true;
                 //}
-
+                if (index === 0) {
+                    input.classList.add("hidden");
+                    label.classList.add("hidden");
+                }
 
 
                 listItem.appendChild(input);
@@ -447,7 +453,7 @@
 
 
                         var ChangeR = res.data.changeResults;
-                        var DeleteR = res.data.deleteResults; 
+                        var DeleteR = res.data.deleteResults;
                         var falsenum = 0;
                         var truenum = 0;
 
@@ -477,13 +483,13 @@
                         var myModal2 = new bootstrap.Modal(myModalEl2);
 
                         myModal2.show();
-
+                        document.getElementById('post').onclick();
 
 
                     })
                     .catch(function (error) {
                         var loginfo = '';
-                        
+
                         if (error.response) {
                             if (error.response.status == 401) {
                                 loginfo = '输入Private_Key不正确';
@@ -494,11 +500,11 @@
                             loginfo = error.message;
 
                         } else {
-                            loginfo = error.message?error.message: '没有收到服务端相应';
+                            loginfo = error.message ? error.message : '没有收到服务端相应';
                         }
 
                         var modalBody = document.getElementById('modal-boly2');
-                        var newContent2 = '<p> 请求结果失败：</p><p>' + loginfo +'</p>';
+                        var newContent2 = '<p> 请求结果失败：</p><p>' + loginfo + '</p>';
                         modalBody.innerHTML = newContent2;
                         // 获取Modal元素
                         var myModalEl2 = document.getElementById('exampleModa2');
@@ -534,7 +540,9 @@
                 if (selectionInfoArray[1].length > 0 || selectionInfoArray[0].length > 0) {
 
                     var modalBody = document.querySelector('.modal-body');
-                    var newContent = '<p> 移除权限工程：' + selectionInfoArray[0].length + ' 个  , 转移权限工程：' + selectionInfoArray[1].length + ' 个 </p> <p> 是否决定提交修改? </p>';
+                    //var newContent = '<p> 移除权限工程：' + selectionInfoArray[0].length + ' 个  , 转移权限工程：' + selectionInfoArray[1].length + ' 个 </p> <p> 是否决定提交修改? </p>';
+                    var newContent = '<p> 移除权限工程：' + selectionInfoArray[1].length + ' 个 </p> <p> 是否决定提交修改? </p>';
+
                     modalBody.innerHTML = newContent;
                     // 获取Modal元素
                     var myModalEl = document.getElementById('exampleModal');
@@ -565,14 +573,16 @@
                         .then(function (res) {
                             const GroupSize = res.data.AllGroups.length;
                             const ProjectSize = res.data.AllProjects.length;
-                            if (GroupSize > 0 || ProjectSize>0 ) {
-                               // res.data.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
+                            if (GroupSize > 0 || ProjectSize > 0) {
+                                res.data.AllProjects.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
+                                res.data.AllGroups.sort((a, b) => b.full_path.charCodeAt(0) - a.full_path.charCodeAt(0));
+
                                 removeAllButFirst();
                                 res.data.AllProjects.forEach(function (porject) {
-                                    addListItem('项目:' + porject.name_with_namespace, porject.web_url, porject.id,true);
+                                    addListItem('项目:' + porject.name_with_namespace, porject.web_url, porject.id, true);
                                 });
                                 res.data.AllGroups.forEach(function (porject) {
-                                    addListItem('项目组:' + porject.full_path, porject.web_url, porject.id,false);
+                                    addListItem('项目组:' + porject.full_path, porject.web_url, porject.id, false);
                                 });
                             }
                         })
@@ -638,7 +648,7 @@
                 // 遍历所有单选按钮并检查它们的状态
                 radioButtons.forEach(function (radioitem) {
 
-                    if (radioitem.value == 'options3' && radioitem.disabled!=true) {
+                    if (radioitem.value == 'options3' && radioitem.disabled != true) {
                         radioitem.checked = true;
                     };
                 });
