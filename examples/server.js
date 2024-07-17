@@ -242,7 +242,7 @@ async function getAllGroups(Private_Key) {
 async function getselfUser(Private_Key) {
     const groupsAPIUrl = 'https://git.code.tencent.com/api/v3/user';
 
-    var out = [];
+    var out = {};
     const config = {
         headers: {
             'PRIVATE-TOKEN': Private_Key,
@@ -256,6 +256,26 @@ async function getselfUser(Private_Key) {
     } else {
         console.log('getselfUserfalse.' + JSON.stringify(Response.data));
 
+    }
+    return out;
+}
+
+async function getOtherUser(Private_Key,username) {
+    const APIUrl = 'https://git.code.tencent.com/api/v3/users';
+
+    var out = {};
+    const config = {
+        headers: {
+            'PRIVATE-TOKEN': Private_Key,
+            'Content-Type': 'application/json',
+        }
+    };
+    const Response = await axios.get(`${APIUrl}/${username}`,config);
+    if (Response && Response.status === 200) {
+        //  console.log('getselfUsersOK.' + JSON.stringify(Response.data));
+        out = Response.data;
+    } else {
+        console.log('getOtherUser.' + JSON.stringify(Response.data));
     }
     return out;
 }
@@ -296,8 +316,7 @@ async function getAllGroupMembers(Private_Key, Groupid) {
 }
 
 
-async function getMasterGroups(MyPrivate_Key) {
-    var selfUser = await getselfUser(MyPrivate_Key);
+async function getMasterGroups(MyPrivate_Key, checkid) {
     var groups = await getAllGroups(MyPrivate_Key);
     var SelectGroups = [];
 
@@ -308,7 +327,7 @@ async function getMasterGroups(MyPrivate_Key) {
         // 对每个组，获取其成员列表
         getAllGroupMembers(MyPrivate_Key, group.id).then(members => {
             for (const member of members) {
-                if (member.id == selfUser.id) {
+                if (member.id == checkid) {
                     SelectGroups.push(group);
                     console.log('------------------group-------------------' + group.full_path);
                 }
@@ -324,9 +343,7 @@ async function getMasterGroups(MyPrivate_Key) {
 }
 
 
-async function getMasterProjects(MyPrivate_Key) {
-    var selfUser = await getselfUser(MyPrivate_Key);
-
+async function getMasterProjects(MyPrivate_Key,checkid) {
     // 首先获取所有项目
     var Projects = await getAllProjects(MyPrivate_Key);
     console.log('------------------Projects-------------------' + Projects.length);
@@ -336,7 +353,7 @@ async function getMasterProjects(MyPrivate_Key) {
     const projectPromises = Projects.map(Project => (
         getAllProjectsMembers(MyPrivate_Key, Project.id).then(members => {
             for (const member of members) {
-                if (member.id == selfUser.id) {
+                if (member.id ==  checkid) {
                     SelectProjects.push(Project);
                     console.log('------------------Project-------------------' + Project.name_with_namespace);
                 }
@@ -349,11 +366,16 @@ async function getMasterProjects(MyPrivate_Key) {
     console.log('------------------SelectProjects-------------------' + SelectProjects.length);
     return SelectProjects;
 }
-async function getMasterAll(MyPrivate_Key) {
-    const Groups = await getMasterGroups(MyPrivate_Key);
-    const projects = await getMasterProjects(MyPrivate_Key);
+async function getMasterAllinfo(MyPrivate_Key, checkid) {
+    const Groups = await getMasterGroups(MyPrivate_Key, checkid);
+    const projects = await getMasterProjects(MyPrivate_Key, checkid);
     return{ AllGroups: Groups, AllProjects: projects };
 }
+async function getMasterAll(MyPrivate_Key) {
+    var selfUser = await getselfUser(MyPrivate_Key)
+    return getMasterAllinfo(MyPrivate_Key, selfUser.id);
+}
+
 
 
 
@@ -579,6 +601,13 @@ async function processDeleteGroups(Groups) {
         return [{ success: false, error: error.response ? error.response.data : error.message }];
     }
 }
+async function GetAllProjectsGroupsWithUser(MyPrivate_Key,checkid) {
+
+    var checkUser = await getOtherUser(MyPrivate_Key, checkid);
+
+    return getMasterAllinfo(MyPrivate_Key, checkUser.id);
+
+}
 
 // 处理所有项目的主函数
 async function processAllProjects(ChangeProjects, DeleteProjects, ChangeGroups, DeleteGroups) {
@@ -786,6 +815,53 @@ server = http.createServer(function (req, res) {
               res.end(JSON.stringify({ success: false, error: error.message }));
           }
       });
+  } else if (url == '/check/server') {
+
+
+      let data = '';
+      req.on('data', function (chunk) {
+          data += chunk;
+      });
+      req.on('end', function () {
+
+          try {
+              console.log('POST data received' + data);
+              const jsonobj = JSON.parse(data);
+              const MyPrivate_Key = jsonobj.Private_Key;
+              const checkID = jsonobj.checkID;
+
+              GetAllProjectsGroupsWithUser(MyPrivate_Key, checkID)
+                  .then((results) => {
+                      res.writeHead(200, {
+                          'Content-Type': 'text/json'
+                      });
+                      const outString = JSON.stringify(results);
+                      res.write(outString);
+                      res.end();
+                  })
+                  .catch((error) => {
+                      if (error.response) {
+                          res.writeHead(error.response.status, error.response.headers);
+                          res.write(JSON.stringify(error.response.data));
+                          res.end();
+
+                      } else if (error.request) {
+                          send404(res);
+                      } else {
+                          console.log('Error', error.message);
+                          send404(res);
+                      }
+                      console.log(error.config);
+                  });
+
+          } catch (error) {
+              // 如果解析 JSON 失败或其它错误，发送错误响应
+              res.writeHead(400, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: false, error: error.message }));
+              console.error('Error parsing JSON or processing data:', error);
+          }
+      });
+
   } else {
     send404(res);
   }
