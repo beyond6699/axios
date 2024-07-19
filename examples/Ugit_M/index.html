@@ -185,7 +185,7 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">私人令牌</span>
-                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username" value="YROE0T1Cn9YLGGlg97yD" aria-describedby="basic-addon1" required>
+                <input type="text" class="form-control" id="Private_Key" placeholder="请输入Private_Key" aria-label="Username" value="" aria-describedby="basic-addon1" required>
                 <div id="feedback1" class="invalid-feedback">
                     请输入Private_Key
                 </div>
@@ -193,9 +193,9 @@
             <div class="input-group mb-3">
 
                 <span class="input-group-text" id="basic-addon1">查找账户</span>
-                <input type="text" class="form-control" id="checkID" placeholder="请输入查找人账户" aria-label="Username" value="erikbli" aria-describedby="basic-addon1" required>
+                <input type="text" class="form-control" id="checkID" placeholder="请输入查找人账户" aria-label="Username" value="" aria-describedby="basic-addon1" required>
                 <div id="feedback2" class="invalid-feedback">
-                    请输入Private_Key
+                    请输入checkID
                 </div>
             </div>
 
@@ -378,6 +378,15 @@
                 listGroup.removeChild(item);
             });
         }
+        function ShowMessage(Message) {
+            var modalBody = document.getElementById('modal-boly2');
+            var newContent = Message;
+            modalBody.innerHTML = newContent;
+            var myModalEl2 = document.getElementById('exampleModa2');
+            var myModal2 = new bootstrap.Modal(myModalEl2);
+            myModal2.show();
+            }
+
         function getUsefulInfo() {
 
             var selectionInfoArray = getSelectionInfo().slice(1);
@@ -428,7 +437,6 @@
             return selectionInfo;
         }
 
-
         (function () {
 
             // 获取“确定”按钮的引用
@@ -438,7 +446,7 @@
             confirmButton.addEventListener('click', function () {
 
                 var selectionInfoArray = getSelectionInfo().slice(1);
-                var mytransformID = document.getElementById('transformID').value;
+                var checkID = document.getElementById('checkID').value;
                 var myPrivate_Key = document.getElementById('Private_Key').value;
 
 
@@ -446,24 +454,15 @@
                 var jsonObj = {};
                 jsonObj.Private_Key = myPrivate_Key;
                 jsonObj.slelectinf = selectionInfoArray;
-                jsonObj.transformid = mytransformID;
-                axios.post('/transform/server', jsonObj)
+                jsonObj.checkID = checkID;
+                axios.post('/removecheck/server', jsonObj)
                     .then(function (res) {
                         console.log(JSON.stringify(res.data));
 
 
-                        var ChangeR = res.data.changeResults;
                         var DeleteR = res.data.deleteResults;
-                        var falsenum = 0;
                         var truenum = 0;
-
-                        ChangeR.forEach(function (change) {
-                            if (change.success == true) {
-                                truenum++;
-                            } else {
-                                falsenum++;
-                            }
-                        });
+                        var falsenum = 0;
                         DeleteR.forEach(function (Delete) {
                             if (Delete.success == true) {
                                 truenum++;
@@ -473,7 +472,7 @@
                         });
                         var modalBody = document.getElementById('modal-boly2');
                         // var newContent = '<p> 请求结果：' + res.data.changeResults.length + ' 个  , 失败：' + res.data.deleteResults.length + ' 个 </p>';
-                        var newContent = '<p> 请求结果：' + JSON.stringify(res.data) + '  </p><p>一共' + (ChangeR.length + DeleteR.length) + '个， 成功' + truenum + '个 ， 失败' + falsenum + '个</p>';
+                        var newContent = '<p> 请求结果：' + JSON.stringify(res.data) + '  </p><p>一共' + ( DeleteR.length) + '个， 成功' + truenum + '个 ' + falsenum + '个</p>';
 
                         modalBody.innerHTML = newContent;
                         // 获取Modal元素
@@ -483,7 +482,7 @@
                         var myModal2 = new bootstrap.Modal(myModalEl2);
 
                         myModal2.show();
-                        document.getElementById('post').onclick();
+                        //document.getElementById('post').onclick();
 
 
                     })
@@ -523,14 +522,14 @@
 
             document.getElementById('config').onclick = function () {
 
-                var data = document.getElementById('transformID').value;
+                var data = document.getElementById('checkID').value;
 
                 var feedback = document.getElementById('feedback2');
 
                 var selectionInfoArray = getUsefulInfo();
                 if (selectionInfoArray[1].length > 0) {
                     if (!data) { // 检查输入值是否为空
-                        feedback.textContent = '请输入转移人ID';
+                        feedback.textContent = '请输入CheckID';
                         feedback.style.display = 'block'; // 显示反馈信息
                         return;
                     }
@@ -540,16 +539,10 @@
                 if (selectionInfoArray[1].length > 0 || selectionInfoArray[0].length > 0) {
 
                     var modalBody = document.querySelector('.modal-body');
-                    //var newContent = '<p> 移除权限工程：' + selectionInfoArray[0].length + ' 个  , 转移权限工程：' + selectionInfoArray[1].length + ' 个 </p> <p> 是否决定提交修改? </p>';
                     var newContent = '<p> 移除权限工程：' + selectionInfoArray[1].length + ' 个 </p> <p> 是否决定提交修改? </p>';
-
                     modalBody.innerHTML = newContent;
-                    // 获取Modal元素
                     var myModalEl = document.getElementById('exampleModal');
-
-                    // 创建Modal实例
                     var myModal = new bootstrap.Modal(myModalEl);
-
                     myModal.show();
                 }
             };
@@ -583,21 +576,35 @@
                 var jsonObj = {};
                 jsonObj.Private_Key = data;
                 jsonObj.checkID = checkID;
+
+
+
                 axios.post('/check/server', jsonObj)
                     .then(function (res) {
-                        const GroupSize = res.data.AllGroups.length;
-                        const ProjectSize = res.data.AllProjects.length;
-                        if (GroupSize > 0 || ProjectSize > 0) {
-                            res.data.AllProjects.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
-                            res.data.AllGroups.sort((a, b) => b.full_path.charCodeAt(0) - a.full_path.charCodeAt(0));
+                       // console.log(JSON.stringify(res.data));
+                        if (res.data.message) {
+                            console.log(res.data.message);
+                            feedback.textContent = res.data.message;
+                            feedback.style.display = 'block'; // 显示反馈信息
+                        } else {
+                            const GroupSize = res.data.AllGroups.length;
+                            const ProjectSize = res.data.AllProjects.length;
+                            var newContent2 = '<p> 查询到：' + (ProjectSize + GroupSize) + ' 个项目</p>';
+                            ShowMessage(newContent2);
 
-                            removeAllButFirst();
-                            res.data.AllProjects.forEach(function (porject) {
-                                addListItem('项目:' + porject.name_with_namespace, porject.web_url, porject.id, true);
-                            });
-                            res.data.AllGroups.forEach(function (porject) {
-                                addListItem('项目组:' + porject.full_path, porject.web_url, porject.id, false);
-                            });
+                            if (GroupSize > 0 || ProjectSize > 0) {
+                                res.data.AllProjects.sort((a, b) => b.name_with_namespace.charCodeAt(0) - a.name_with_namespace.charCodeAt(0));
+                                res.data.AllGroups.sort((a, b) => b.full_path.charCodeAt(0) - a.full_path.charCodeAt(0));
+
+                                removeAllButFirst();
+                                res.data.AllProjects.forEach(function (porject) {
+                                    addListItem('项目:' + porject.name_with_namespace, porject.web_url, porject.id, true);
+                                });
+                                res.data.AllGroups.forEach(function (porject) {
+                                    addListItem('项目组:' + porject.full_path, porject.web_url, porject.id, false);
+                                });
+                            }
+
                         }
                     })
                     .catch(function (error) {
@@ -609,19 +616,16 @@
                                 loginfo = error.response.data;
                             }
                         } else if (error.request) {
-                            loginfo = '没有收到服务端相应';
+                            loginfo = '没有收到服务端相应1';
 
+                        } else if (error.message) {
+                            loginfo = error.message;
                         } else {
-                            loginfo = '没有收到服务端相应';
+                            loginfo = '没有收到服务端相应2';
                         }
-
-
                         feedback.textContent = loginfo;
                         feedback.style.display = 'block'; // 显示反馈信息
                     });
-
-                
-
             };
 
 
